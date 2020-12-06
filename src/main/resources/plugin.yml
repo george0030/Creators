@@ -1,0 +1,10 @@
+name: Creators
+version: ${project.version}
+main: me.george0030.creators.Creators
+api-version: 1.16
+commands:
+  creators:
+    description: Foo command
+    permission: test.foo
+    permission-message: You do not have permission!
+    usage: /<command> [test|stop]
