@@ -224,27 +224,29 @@ public class CreatorsGUI {
         }
 
         inv.addItem((ItemStack[]) items.toArray());
-
+    
         if (!isLast) {
             inv.addItem(new ItemStack(NEXT_PAGE));
         } else {
-            inv.addItem(createHead(creators.get(i + 1).playerName, "youtube.com/channel/" + creators.get(i + 1).youtube));
+            inv.addItem(
+                    createHead(creators.get(i + 1).playerName, "youtube.com/channel/" + creators.get(i + 1).youtube));
         }
-
+    
         return inv;
     }
-
-    public void openAnvilGUI(Player p, String title, String loadingMessage, ItemStack itemToBeNamed) {
-
+    
+    public void openAnvilGUI(Player p, String title, String loadingMessage, ItemStack itemToBeNamed,
+                             boolean openChestGUIAfterwards) {
+        
         anvilInventory.put(p.getUniqueId(), new AnvilGUI.Builder().itemLeft(itemToBeNamed)
                 .title(title)
                 .text("/")
                 .plugin(plugin)
                 .onComplete((player, s) -> {
-
-
+                    
+                    
                     new CreatorsInserter(plugin, player.getUniqueId(), player.getName(),
-                            s, true, true, true).runTaskAsynchronously(plugin);
+                                         s, true, true, openChestGUIAfterwards).runTaskAsynchronously(plugin);
 
                     return AnvilGUI.Response.text(loadingMessage);
 

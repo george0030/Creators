@@ -6,9 +6,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.sql.SQLException;
 
 public class CreatorsListener implements Listener {
 
@@ -74,18 +77,36 @@ public class CreatorsListener implements Listener {
 
         }
     }
-
-
+    
+    
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
         if (e.getPlayer() instanceof Player) {
             Player p = (Player) e.getPlayer();
-            if (gui.currentlyChangingPage.get(p.getUniqueId()) != null && !gui.currentlyChangingPage.get(p.getUniqueId())) {
+            if (gui.currentlyChangingPage.get(p.getUniqueId()) != null && !gui.currentlyChangingPage.get(
+                    p.getUniqueId())) {
                 gui.removeGUI(p.getUniqueId());
-            } else gui.currentlyChangingPage.put(e.getPlayer().getUniqueId(), false);
+            } else {
+                gui.currentlyChangingPage.put(e.getPlayer().getUniqueId(), false);
+            }
         }
     }
-
+    
+    @EventHandler
+    public void onPlayerJoinEvent(PlayerJoinEvent e) {
+        
+        try {
+            if (e.getPlayer().hasPermission("creators.youtuber") && !plugin.database.containsEntry(
+                    e.getPlayer().getName())) {
+                plugin.gui.openAnvilGUI(e.getPlayer(), "§4Enter YouTube ID:", "Loading...§7", CreatorsGUI.ITEM_TO_NAME,
+                                        false);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        
+    }
+    
 }
 
 

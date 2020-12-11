@@ -47,10 +47,11 @@ public class CreatorsInserter extends BukkitRunnable {
 
                 @Override
                 public void run() {
-
+    
                     plugin.gui.closeAnvilGUI(playerID);
-                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§4Unable to access youtube", "§7Loading...", CreatorsGUI.ITEM_TO_NAME);
-
+                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§4Unable to access youtube",
+                                            "§7Loading...", CreatorsGUI.ITEM_TO_NAME, showGUI);
+    
                 }
             }.runTask(plugin);
             return;
@@ -61,10 +62,11 @@ public class CreatorsInserter extends BukkitRunnable {
 
                 @Override
                 public void run() {
-
+    
                     plugin.gui.closeAnvilGUI(playerID);
-                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§4Channel not found", "§7Loading...", CreatorsGUI.ITEM_TO_NAME);
-
+                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§4Channel not found", "§7Loading"
+                            + "...", CreatorsGUI.ITEM_TO_NAME, showGUI);
+    
                 }
             }.runTask(plugin);
             return;
@@ -79,7 +81,8 @@ public class CreatorsInserter extends BukkitRunnable {
                 @Override
                 public void run() {
                     plugin.gui.closeAnvilGUI(playerID);
-                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§cUnable to write to database", "§7Loading...", CreatorsGUI.ITEM_TO_NAME);
+                    plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§cUnable to write to database",
+                                            "§7Loading...", CreatorsGUI.ITEM_TO_NAME, showGUI);
                 }
             }.runTask(plugin);
             return;
@@ -97,7 +100,8 @@ public class CreatorsInserter extends BukkitRunnable {
                         @Override
                         public void run() {
                             plugin.gui.closeAnvilGUI(playerID);
-                            plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§cCan't access database", "§7Loading...", CreatorsGUI.ITEM_TO_NAME);
+                            plugin.gui.openAnvilGUI(plugin.getServer().getPlayer(playerID), "§cCan't access database"
+                                    , "§7Loading...", CreatorsGUI.ITEM_TO_NAME, showGUI);
                         }
                     }.runTask(plugin);
                     return;

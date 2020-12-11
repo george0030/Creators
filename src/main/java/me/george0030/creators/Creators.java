@@ -2,10 +2,10 @@ package me.george0030.creators;
 
 import me.george0030.creators.io.CreatorsDB;
 import me.george0030.creators.io.YoutubeData;
-import me.george0030.creators.listener.CreatorsCommand;
-import me.george0030.creators.listener.CreatorsGUI;
-import me.george0030.creators.listener.CreatorsListener;
+import me.george0030.creators.listener.*;
 import me.george0030.creators.tasks.RegularFetcher;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -19,6 +19,7 @@ public class Creators extends JavaPlugin {
     public CreatorsCommand creatorsCommand;
     public CreatorsListener listener;
     public RegularFetcher fetcher;
+    public LuckPerms luckPerms;
 
     @Override
     public void onEnable() {
@@ -30,6 +31,7 @@ public class Creators extends JavaPlugin {
         this.creatorsCommand = new CreatorsCommand(this);
         this.listener = new CreatorsListener(this);
         this.fetcher = new RegularFetcher(this);
+        luckPerms = LuckPermsProvider.get();
 
         try {
             database.openConnection();

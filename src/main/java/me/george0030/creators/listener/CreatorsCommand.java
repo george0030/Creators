@@ -1,9 +1,7 @@
 package me.george0030.creators.listener;
 
 import me.george0030.creators.Creators;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 public class CreatorsCommand implements CommandExecutor {
@@ -20,17 +18,27 @@ public class CreatorsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-
-            if (player.hasPermission("creators.youtuber") && args.length > 1 /*&& plugin.database.containsEntry*/)
-                plugin.gui.openAnvilGUI(player, "§4Enter YouTube ID:", "Loading...§7", CreatorsGUI.ITEM_TO_NAME);
-            else if (plugin.getConfig().getBoolean("query_regularly"))
+            if (args.length >= 1) {
+                boolean hasPerms = player.hasPermission("creators.youtuber");
+                switch (args[0]) {
+                    case "register":
+                        if (hasPerms) {
+                            plugin.gui.openAnvilGUI(player, "§4Enter YouTube ID:", "Loading...§7",
+                                                    CreatorsGUI.ITEM_TO_NAME, false);
+                        }
+                    default: {
+                        player.sendMessage("§bUsage:\n§l§2/creators§r§b - Show YouTube creators that play on "
+                                                   + "this server.");
+                        if (hasPerms) {
+                            player.sendMessage("§l§2/creators register§r§b - Register your own YouTube ID.");
+                        }
+                    }
+                }
+            } else {
                 plugin.gui.openGUIfromCache(player);
-            else {
-
             }
         }
-
-
+    
         return true;
     }
 }

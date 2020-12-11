@@ -4,7 +4,7 @@ main: me.george0030.creators.Creators
 api-version: 1.16
 commands:
   creators:
-    description: Foo command
-    permission: test.foo
+    description: List YouTube creators that play on this server
+    permission: creators.view
     permission-message: You do not have permission!
-    usage: /<command> [test|stop]
+    usage: /creators
