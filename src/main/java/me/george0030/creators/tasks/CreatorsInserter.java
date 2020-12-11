@@ -41,7 +41,7 @@ public class CreatorsInserter extends BukkitRunnable {
         try {
             subCount = plugin.youtubeData.findSubCount(youtube.substring(youtube.lastIndexOf("/") + 1));
         } catch (IOException e) {
-            plugin.getLogger().severe("Unable to access YouTube");
+            plugin.getLogger().warning("Unable to access YouTube");
             e.printStackTrace();
             new BukkitRunnable() {
 
@@ -75,7 +75,7 @@ public class CreatorsInserter extends BukkitRunnable {
         try {
             db.insert(playerName, youtube.substring(youtube.lastIndexOf("/") + 1), subCount);
         } catch (SQLException throwables) {
-            plugin.getLogger().severe("Failed to insert " + playerName + " into database.");
+            plugin.getLogger().warning("Failed to insert " + playerName + " into database.");
             throwables.printStackTrace();
             new BukkitRunnable() {
                 @Override
@@ -87,14 +87,23 @@ public class CreatorsInserter extends BukkitRunnable {
             }.runTask(plugin);
             return;
         }
-
+    
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getServer().getPlayer(playerID).sendMessage(
+                        "§a Successfully registered YouTube channel §dyoutube.com/" + youtube.substring(
+                                youtube.lastIndexOf("/") + 1));
+            }
+        }.runTask(plugin);
+    
         if (refreshCache) {
             synchronized (db) {
                 try {
                     db.fetchToCache();
                     plugin.gui.updateInventoryCache(db.cache, db.cache.size() >= db.numberOfCreatorsInDatabase);
                 } catch (SQLException throwables) {
-                    plugin.getLogger().severe("Database query requested for " + playerName + " failed.");
+                    plugin.getLogger().warning("Database query requested for " + playerName + " failed.");
                     throwables.printStackTrace();
                     new BukkitRunnable() {
                         @Override

@@ -60,7 +60,7 @@ public class RegularFetcher extends BukkitRunnable {
             }
 
             if (fails == queryRetries) {
-                plugin.getLogger().severe("Database query failed " + fails + " times. Latest exception: ");
+                plugin.getLogger().warning("Database query failed " + fails + " times. Latest exception: ");
                 latestException.printStackTrace();
                 return;
 

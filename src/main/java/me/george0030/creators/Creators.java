@@ -4,8 +4,7 @@ import me.george0030.creators.io.CreatorsDB;
 import me.george0030.creators.io.YoutubeData;
 import me.george0030.creators.listener.*;
 import me.george0030.creators.tasks.RegularFetcher;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
+import me.george0030.creators.tasks.TableMaintainer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ public class Creators extends JavaPlugin {
     public CreatorsCommand creatorsCommand;
     public CreatorsListener listener;
     public RegularFetcher fetcher;
-    public LuckPerms luckPerms;
+    public TableMaintainer maintainer;
 
     @Override
     public void onEnable() {
@@ -31,21 +30,33 @@ public class Creators extends JavaPlugin {
         this.creatorsCommand = new CreatorsCommand(this);
         this.listener = new CreatorsListener(this);
         this.fetcher = new RegularFetcher(this);
-        luckPerms = LuckPermsProvider.get();
-
+        this.maintainer = new TableMaintainer(this);
+    
         try {
             database.openConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            getServer().getPluginManager().disablePlugin(this);
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+        } catch (ClassNotFoundException e) {
+            getLogger().severe("SQL driver not found");
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
         }
-
+    
+        maintainer.run();
         fetcher.run();
-        fetcher.runTaskTimerAsynchronously(this, getConfig().getLong("query_cooldown"), getConfig().getLong("query_cooldown"));
+        maintainer.runTaskTimerAsynchronously(this, getConfig().getLong("maintenance_cooldown"), getConfig().getLong(
+                "maintenance_cooldown"));
+        fetcher.runTaskTimerAsynchronously(this, getConfig().getLong("query_cooldown"),
+                                           getConfig().getLong("query_cooldown"));
         getServer().getPluginManager().registerEvents(listener, this);
         getCommand("creators").setExecutor(creatorsCommand);
-
+    
     }
 
     @Override

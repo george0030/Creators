@@ -11,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.sql.SQLException;
-
 public class CreatorsListener implements Listener {
 
     private final Creators plugin;
@@ -94,19 +92,18 @@ public class CreatorsListener implements Listener {
     
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent e) {
-        
-        try {
-            if (e.getPlayer().hasPermission("creators.youtuber") && !plugin.database.containsEntry(
-                    e.getPlayer().getName())) {
+    
+    
+        if (e.getPlayer().hasPermission("creators.youtuber")) {
+    
+            if (!plugin.database.containsEntry(e.getPlayer().getName())) {
                 plugin.gui.openAnvilGUI(e.getPlayer(), "§4Enter YouTube ID:", "Loading...§7", CreatorsGUI.ITEM_TO_NAME,
                                         false);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
-        
-    }
     
+    
+    }
 }
 
 
