@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.george0030</groupId>
-    <artifactId>creators</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>Creators</artifactId>
+    <version>1.0.0-alpha</version>
     <packaging>jar</packaging>
 
     <name>Creators</name>

@@ -73,7 +73,7 @@ public class CreatorsInserter extends BukkitRunnable {
         }
 
         try {
-            db.insert(playerName, youtube.substring(youtube.lastIndexOf("/") + 1), subCount);
+            db.insert(playerID, youtube.substring(youtube.lastIndexOf("/") + 1), subCount);
         } catch (SQLException throwables) {
             plugin.getLogger().warning("Failed to insert " + playerName + " into database.");
             throwables.printStackTrace();

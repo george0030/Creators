@@ -6,8 +6,7 @@ import me.george0030.creators.io.CreatorsDB;
 import me.george0030.creators.misc.CreatorsRow;
 import me.george0030.creators.tasks.CreatorsInserter;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -79,7 +78,7 @@ public class CreatorsGUI {
             inv.addItem(PREVIOUS_PAGE);
         }
         for (CreatorsRow row : creators) {
-            inv.addItem(createHead(row.playerName, "youtube.com/channel/" + row.youtube));
+            inv.addItem(createHead(row.playerUUID, "youtube.com/channel/" + row.youtube));
         }
         if (!isLast) {
             inv.addItem(NEXT_PAGE);
@@ -108,7 +107,7 @@ public class CreatorsGUI {
 
         return inv;
     }
-
+    
     public static ItemStack createHead(String name, List<String> description) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skull = (SkullMeta) item.getItemMeta();
@@ -118,13 +117,30 @@ public class CreatorsGUI {
         item.setItemMeta(skull);
         return item;
     }
-
+    
+    public static ItemStack createHead(UUID playerUUID, String description) {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(description);
+        return createHead(playerUUID, list);
+    }
+    
+    public static ItemStack createHead(UUID playerUUID, List<String> description) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerUUID);
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skull = (SkullMeta) item.getItemMeta();
+        skull.setDisplayName(player.getName());
+        skull.setLore(description);
+        skull.setOwningPlayer(player);
+        item.setItemMeta(skull);
+        return item;
+    }
+    
     public static ItemStack createHead(String name, String description) {
         ArrayList<String> list = new ArrayList<String>();
         list.add(description);
         return createHead(name, list);
     }
-
+    
     //SYNC
     public void openGUIfromCache(Player p) {
         UUID playerID = p.getUniqueId();
@@ -213,14 +229,14 @@ public class CreatorsGUI {
         int until = Math.min(size - 2, creators.size());
         int i = 0;
         while (i < until) {
-            items.add(createHead(creators.get(i).playerName, "youtube.com/channel/" + creators.get(i).youtube));
+            items.add(createHead(creators.get(i).playerUUID, "youtube.com/channel/" + creators.get(i).youtube));
             i++;
         }
         if (!isFirst) {
             inv.addItem(new ItemStack(PREVIOUS_PAGE));
         } else {
             i++;
-            items.add(createHead(creators.get(i).playerName, "youtube.com/channel/" + creators.get(i).youtube));
+            items.add(createHead(creators.get(i).playerUUID, "youtube.com/channel/" + creators.get(i).youtube));
         }
 
         inv.addItem((ItemStack[]) items.toArray());
@@ -229,7 +245,7 @@ public class CreatorsGUI {
             inv.addItem(new ItemStack(NEXT_PAGE));
         } else {
             inv.addItem(
-                    createHead(creators.get(i + 1).playerName, "youtube.com/channel/" + creators.get(i + 1).youtube));
+                    createHead(creators.get(i + 1).playerUUID, "youtube.com/channel/" + creators.get(i + 1).youtube));
         }
     
         return inv;
@@ -270,31 +286,6 @@ public class CreatorsGUI {
     public void closeAnvilGUI(UUID playerID) {
         anvilInventory.get(playerID).closeInventory();
     }
-
-//    public boolean closeAnvilGUI(Player p){
-//        boolean guiOpenInitially = hasAnvilGUIOpen(p);
-//        anvilInventory.remove(p.getUniqueId());
-//        p.closeInventory();
-//        p.setLevel(previousLevel.get(p.getUniqueId()));
-//        previousLevel.remove(p.getUniqueId());
-//        return guiOpenInitially;
-//
-//    }
-
-//    public boolean removeAnvilGUI(UUID playerID){
-//        boolean guiOpenInitially = anvilInventory.containsKey(playerID);
-//        anvilInventory.remove(playerID);
-//        previousLevel.remove(playerID);
-//        return guiOpenInitially;
-//    }
-
-    // Must be called on shutdown, otherwise players' levels will be corrupted
-//    public void removeAllAnvilGUIs(){
-//        anvilInventory.clear();
-//        for(Map.Entry<UUID, Integer> entry : previousLevel.entrySet()){
-//            plugin.getServer().getPlayer(entry.getKey()).setLevel(entry.getValue());
-//        }
-//    }
 
     public boolean hasAnvilGUIOpen(Player p) {
         return anvilInventory.containsKey(p.getUniqueId());

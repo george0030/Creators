@@ -5,6 +5,8 @@ import me.george0030.creators.misc.CreatorsRow;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.sql.*;
 import java.util.*;
 
@@ -28,34 +30,19 @@ public class CreatorsDB {
     public void openConnection() throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException {
     
         FileConfiguration config = plugin.getConfig();
-//        String host = config.getString("host");
-//        String port = config.getString("port");
-//        String database = config.getString("database");
         String username = config.getString("username");
         String password = config.getString("password");
         Class.forName(plugin.getConfig().getString("sql_driver")).newInstance();
         connection = DriverManager.getConnection(plugin.getConfig().getString("url"), username, password);
         table = plugin.getConfig().getString("table");
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS " + table + " (playername VARCHAR(255) NOT "
-                        + "NULL "
-                        + "UNIQUE, youtube TINYTEXT, subcount BIGINT(255))");
-        fetchQuery = connection.prepareStatement("SELECT playername, youtube, subcount FROM " + table + " ORDER BY "
+                "CREATE TABLE IF NOT EXISTS " + table
+                        + " (playerUUID BINARY(16), youtube TINYTEXT, subcount BIGINT(255))");
+        fetchQuery = connection.prepareStatement("SELECT playerUUID, youtube, subcount FROM " + table + " ORDER BY "
                                                          + "subcount DESC LIMIT ? OFFSET ?");
     
     }
-
-//    public List<CreatorsRow> get(int fromNthBySubcount, int number) throws SQLException {
-//
-//        if(fromNthBySubcount + number <= cacheCapacity)
-//            return cache.subList(fromNthBySubcount,fromNthBySubcount + number);
-//        else
-//            return fetch(fromNthBySubcount, number);
-//
-//
-//    }
-
-    //100% functional
+    
     public void fetchToCache() throws SQLException {
         fetchQuery.setInt(2, 0);
         fetchQuery.setInt(1, cacheCapacity);
@@ -63,20 +50,27 @@ public class CreatorsDB {
         ResultSet result = fetchQuery.executeQuery();
         cache.clear();
         while (result.next()) {
-            cache.add(new CreatorsRow(result.getString(1), result.getString(2), result.getLong(3)));
-
+            cache.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3)));
+            
         }
-
+        
         numberOfCreatorsInDatabase = fetchNumberOfCreatorsInDatabase();
-
+        
     }
-
+    
+    private UUID uuidFromBytes(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        long high = bb.getLong();
+        long low = bb.getLong();
+        return new UUID(high, low);
+    }
+    
     public int fetchNumberOfCreatorsInDatabase() throws SQLException {
         ResultSet result = connection.createStatement().executeQuery("SELECT COUNT(*) FROM " + table);
         result.next();
         return result.getInt(1);
     }
-
+    
     public List<CreatorsRow> fetch(int fromNthBySubcount, int number) throws SQLException {
         fetchQuery.setInt(1, number);
         fetchQuery.setInt(2, fromNthBySubcount);
@@ -84,21 +78,30 @@ public class CreatorsDB {
         LinkedList<CreatorsRow> table = new LinkedList<CreatorsRow>();
         int i = 0;
         while (result.next()) {
-            table.add(new CreatorsRow(result.getString(1), result.getString(2), result.getLong(3)));
+            table.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3)));
         }
-
+        
         return table;
-
+        
     }
     
-    public void insert(String playerName, String youtube, long subs) throws SQLException {
-        PreparedStatement insertQuery = connection.prepareStatement("REPLACE INTO " + table + " (playername, youtube, "
+    public void insert(UUID playerUUID, String youtube, long subs) throws SQLException {
+        PreparedStatement insertQuery = connection.prepareStatement("REPLACE INTO " + table + " (playerUUID, youtube, "
                                                                             + "subcount) VALUES (?,"
                                                                             + "?,?)");
-        insertQuery.setString(1, playerName);
+        insertQuery.setBytes(1, bytesFromUUID(playerUUID));
         insertQuery.setString(2, youtube);
         insertQuery.setLong(3, subs);
         insertQuery.execute();
+    }
+    
+    private byte[] bytesFromUUID(UUID uuid) {
+        byte[] bytes = new byte[16];
+        ByteBuffer.wrap(bytes)
+                .order(ByteOrder.BIG_ENDIAN)
+                .putLong(uuid.getMostSignificantBits())
+                .putLong(uuid.getLeastSignificantBits());
+        return bytes;
     }
     
     public int[] refreshTable() throws SQLException, IOException {
@@ -124,11 +127,8 @@ public class CreatorsDB {
         return statement.executeBatch();
     }
     
-    public boolean containsEntry(String playerName) {
-        return cache.stream().anyMatch(row -> row.playerName.equals(playerName));
-//        ResultSet result = connection.prepareStatement("SELECT COUNT(*) FROM creators WHERE playername = ?").executeQuery();
-//        result.next();
-//        return result.getInt(1) > 0;
+    public boolean containsEntry(UUID playerUUID) {
+        return cache.stream().anyMatch(row -> row.playerUUID.equals(playerUUID));
     }
     
     

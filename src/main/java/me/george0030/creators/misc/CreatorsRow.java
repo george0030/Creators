@@ -1,13 +1,15 @@
 package me.george0030.creators.misc;
 
-public class CreatorsRow {
+import java.util.UUID;
 
-    public final String playerName;
+public class CreatorsRow {
+    
+    public final UUID playerUUID;
     public final String youtube;
     public final long subcount;
     
-    public CreatorsRow(String playerName, String youtube, long subcount) {
-        this.playerName = playerName;
+    public CreatorsRow(UUID playerUUID, String youtube, long subcount) {
+        this.playerUUID = playerUUID;
         this.youtube = youtube;
         this.subcount = subcount;
     }

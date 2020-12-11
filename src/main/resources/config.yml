@@ -1,14 +1,13 @@
-#SQL:
-
 
 # SQL driver class name. If you are using MySql, it is com.mysql.jdbc.Driver
 sql_driver: com.mysql.jdbc.Driver
 
-# URL of your database
+# URL of your SQL database
 # Example: jdbc:mysql://localhost:3306/creatorsdb"
 url: "jdbc:mysql://localhost:3306/creatorsdb"
 
 # Username and password on the database
+
 username: root
 password: root
 
@@ -16,18 +15,17 @@ password: root
 table: "creators"
 
 # Time between queries to the database, in ticks:
-query_cooldown: 200
-# Only the data of the first local_cache creators by subscriber count will be continually stored locally. All creators that don't fit in will only be fetched from the database if necessary.
+query_cooldown: 600
+# Only the data of the first local_cache creators by subscriber count will be continually stored locally.
+# All creators that don't fit in will only be fetched from the database if necessary.
 local_cache: 10000
 
-# If a query fails, this many milliseconds will be spent before attempting again.
-retry_cooldown: 0
 # The query will be tried this many times before returning back to normal schedule.
 query_retries: 2
 
 # Table maintenance (updating subscriber counts, removing entries with non-exsisting channels)
 # Cooldown in ticks
-maintenance_cooldown: 300
+maintenance_cooldown: 72000
 
 
 # Youtube API-key. Required for checking channel validity.

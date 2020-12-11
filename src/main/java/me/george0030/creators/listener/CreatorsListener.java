@@ -37,12 +37,7 @@ public class CreatorsListener implements Listener {
                             gui.nextPage(p);
                         }
                     }.runTask(plugin);
-
-                    //int pageNumber = gui.whatPage.get(p.getUniqueId()) + 1;
-                    //Inventory page = playersGUI.get(pageNumber);
-                    //if(page != null){
-                    //    p.openInventory(page);
-                    //   gui.whatPage.put(p.getUniqueId(), pageNumber);
+    
                 } else if (item.getType() == CreatorsGUI.PREVIOUS_PAGE.getType()) {
                     new BukkitRunnable() {
                         @Override
@@ -62,13 +57,6 @@ public class CreatorsListener implements Listener {
                         }
                     }.runTask(plugin);
                 }
-//                    else{
-//                        if(plugin.database.numberOfCreatorsInDatabase > gui.numberOfHeadsInGui.get(p.getUniqueId())){
-//
-//                            p.openInventory(CreatorsGUI.LOADING_INVENTORY);
-//
-//                        }
-//                    }
 
             }
 
@@ -96,7 +84,7 @@ public class CreatorsListener implements Listener {
     
         if (e.getPlayer().hasPermission("creators.youtuber")) {
     
-            if (!plugin.database.containsEntry(e.getPlayer().getName())) {
+            if (!plugin.database.containsEntry(e.getPlayer().getUniqueId())) {
                 plugin.gui.openAnvilGUI(e.getPlayer(), "§4Enter YouTube ID:", "Loading...§7", CreatorsGUI.ITEM_TO_NAME,
                                         false);
             }

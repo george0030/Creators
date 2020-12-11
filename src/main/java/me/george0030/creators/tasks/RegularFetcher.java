@@ -12,11 +12,7 @@ public class RegularFetcher extends BukkitRunnable {
     private final Creators plugin;
     private final CreatorsDB db;
     private final CreatorsGUI gui;
-    private final long queryCooldown;
-    private final long retryCooldown;
     private final int queryRetries;
-    private final boolean logging;
-    private final int localCache;
 
     private int fails;
     private SQLException latestException;
@@ -25,11 +21,7 @@ public class RegularFetcher extends BukkitRunnable {
         this.plugin = plugin;
         db = plugin.database;
         gui = plugin.gui;
-        queryCooldown = plugin.getConfig().getLong("query_cooldown");
-        retryCooldown = plugin.getConfig().getLong("retry_cooldown");
         queryRetries = plugin.getConfig().getInt("query_retries");
-        logging = plugin.getConfig().getBoolean("logging");
-        localCache = plugin.getConfig().getInt("local_cache");
         fails = 0;
     }
 
