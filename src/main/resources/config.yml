@@ -14,17 +14,16 @@ password: root
 # What table should contain the data used by this plugin
 table: "creators"
 
-# Time between queries to the database, in ticks:
-query_cooldown: 600
-# Only the data of the first local_cache creators by subscriber count will be continually stored locally.
-# All creators that don't fit in will only be fetched from the database if necessary.
+# Time between queries to refresh the local cache, in ticks. Set to -1 if you wish to query at startup.
+query_cooldown: 12000
+# Only the data of the first local_cache creators by subscriber count will be stored locally.
 local_cache: 10000
 
 # The query will be tried this many times before returning back to normal schedule.
 query_retries: 2
 
 # Table maintenance (updating subscriber counts, removing entries with non-exsisting channels)
-# Cooldown in ticks
+# Cooldown in ticks, set to -1 if you wish to do maintenance only on startup.
 maintenance_cooldown: 72000
 
 

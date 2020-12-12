@@ -68,10 +68,14 @@ public class Creators extends JavaPlugin {
     
         maintainer.run();
         fetcher.run();
-        maintainer.runTaskTimerAsynchronously(this, getConfig().getLong("maintenance_cooldown"), getConfig().getLong(
-                "maintenance_cooldown"));
-        fetcher.runTaskTimerAsynchronously(this, getConfig().getLong("query_cooldown"),
-                                           getConfig().getLong("query_cooldown"));
+        long maintenance_cooldown = getConfig().getLong("maintenance_cooldown");
+        if (maintenance_cooldown >= 0) {
+            maintainer.runTaskTimerAsynchronously(this, maintenance_cooldown, maintenance_cooldown);
+        }
+        long query_cooldown = getConfig().getLong("query_cooldown");
+        if (query_cooldown >= 0) {
+            fetcher.runTaskTimerAsynchronously(this, query_cooldown, query_cooldown);
+        }
         getServer().getPluginManager().registerEvents(listener, this);
         getCommand("creators").setExecutor(creatorsCommand);
     

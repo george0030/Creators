@@ -41,8 +41,9 @@ public class CreatorsDB {
                         + " (playerUUID BINARY(16) NOT NULL UNIQUE, youtube TINYTEXT, subcount BIGINT(255), "
                         + "lastlogoutUTC DATETIME, playername VARCHAR(32))");
         plugin.getLogger().finer("Successfully connected to database " + plugin.getConfig().getString("url"));
-        fetchQuery = connection.prepareStatement("SELECT playerUUID, youtube, subcount, lastlogoutUTC FROM " + table
-                                                         + " ORDER BY subcount DESC LIMIT ? OFFSET ?");
+        fetchQuery = connection.prepareStatement(
+                "SELECT playerUUID, youtube, subcount, lastlogoutUTC, playername FROM " + table
+                        + " ORDER BY subcount DESC LIMIT ? OFFSET ?");
     
     }
     
@@ -54,7 +55,7 @@ public class CreatorsDB {
         cache.clear();
         while (result.next()) {
             cache.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3),
-                                      result.getTimestamp(4), null));
+                                      result.getTimestamp(4), result.getString(5)));
     
         }
         
@@ -158,15 +159,23 @@ public class CreatorsDB {
                 changes.append("UPDATE " + table + " SET subcount = ").append(subCount).append(
                         " WHERE youtube = '").append(youtubeID).append("'");
             }
-            
+    
             statement.addBatch(changes.toString());
         }
-        
+    
         return statement.executeBatch();
     }
     
     public boolean containsEntry(UUID playerUUID) {
         return cache.stream().anyMatch(row -> row.playerUUID.equals(playerUUID));
+    }
+    
+    public Optional<CreatorsRow> getEntry(UUID playerUUID) {
+        return cache.stream().filter(row -> row.playerUUID.equals(playerUUID)).findFirst();
+    }
+    
+    public Optional<CreatorsRow> getEntry(String name) {
+        return cache.stream().filter(row -> name.equalsIgnoreCase(row.playerName)).findFirst();
     }
     
     
