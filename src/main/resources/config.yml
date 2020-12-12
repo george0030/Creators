@@ -31,3 +31,7 @@ maintenance_cooldown: 72000
 # Youtube API-key. Required for checking channel validity.
 
 youtube_apikey: AIzaSyAHF23xweo41nh8CzKYkKLmBzaSrFxlfNk
+
+# Number of slots in the inventory GUI. Must be a multiple of 9, only 27 and 54 have been proven stable.
+
+gui_size: 54

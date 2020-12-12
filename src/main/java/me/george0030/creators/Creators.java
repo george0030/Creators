@@ -8,10 +8,12 @@ import me.george0030.creators.tasks.TableMaintainer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Creators extends JavaPlugin {
-
-
+    
+    
     public CreatorsGUI gui;
     public CreatorsDB database;
     public YoutubeData youtubeData;
@@ -19,12 +21,28 @@ public class Creators extends JavaPlugin {
     public CreatorsListener listener;
     public RegularFetcher fetcher;
     public TableMaintainer maintainer;
-
+    
+    @Override
+    public void onDisable() {
+        
+        try {
+            int[] result = database.updateLastLogonsNow(
+                    getServer().getOnlinePlayers().stream().map(p -> p.getUniqueId()).collect(Collectors.toList()));
+            int successfulUpdates = Arrays.stream(result).reduce(0, (x, y) -> y > 0 ? x + y : x);
+            getServer().getLogger().finest(
+                    "Successfully updated last seen data of " + successfulUpdates + " creator(s) to the database");
+        } catch (SQLException throwables) {
+            getLogger().warning("Could not update last seen data of creators to database.");
+            throwables.printStackTrace();
+        }
+        
+    }
+    
     @Override
     public void onEnable() {
-
+        
         saveDefaultConfig();
-        this.gui = new CreatorsGUI(this, 27);
+        this.gui = new CreatorsGUI(this, getConfig().getInt("gui_size"));
         this.database = new CreatorsDB(this);
         this.youtubeData = new YoutubeData(this);
         this.creatorsCommand = new CreatorsCommand(this);
@@ -57,9 +75,5 @@ public class Creators extends JavaPlugin {
         getServer().getPluginManager().registerEvents(listener, this);
         getCommand("creators").setExecutor(creatorsCommand);
     
-    }
-
-    @Override
-    public void onDisable() {
     }
 }

@@ -10,8 +10,12 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 public class CreatorsGUI {
@@ -40,6 +44,14 @@ public class CreatorsGUI {
         numberOfHeadsInGui = new HashMap<UUID, Integer>();
         currentlyChangingPage = new HashMap<UUID, Boolean>();
         anvilInventory = new HashMap<UUID, AnvilGUI>();
+    
+        ItemMeta nextMeta = NEXT_PAGE.getItemMeta();
+        nextMeta.setDisplayName(ChatColor.RESET.toString() + ChatColor.DARK_GREEN + ChatColor.BOLD + "Next page");
+        NEXT_PAGE.setItemMeta(nextMeta);
+        ItemMeta previousMeta = PREVIOUS_PAGE.getItemMeta();
+        previousMeta.setDisplayName(ChatColor.RESET.toString() + ChatColor.RED + ChatColor.BOLD + "Previous page");
+        PREVIOUS_PAGE.setItemMeta(previousMeta);
+    
     }
 
     //Probably fine
@@ -69,7 +81,6 @@ public class CreatorsGUI {
 
     }
 
-    //Fine
     private static Inventory createPage(boolean isFirst, boolean isLast, List<CreatorsRow> creators, int size, String title) {
 
 
@@ -78,32 +89,11 @@ public class CreatorsGUI {
             inv.addItem(PREVIOUS_PAGE);
         }
         for (CreatorsRow row : creators) {
-            inv.addItem(createHead(row.playerUUID, "youtube.com/channel/" + row.youtube));
+            inv.addItem(createHead(row));
         }
         if (!isLast) {
             inv.addItem(NEXT_PAGE);
         }
-//
-//        int until = Math.min(size, creators.size());
-//        int i = 0;
-//
-//        if(!isFirst) {
-//
-//            inv.addItem(new ItemStack(PREVIOUS_PAGE));
-//            until--;
-//
-//        }
-//
-//        while(i < until){
-//            inv.addItem(createHead(creators.get(i).playerName, "youtube.com/channel/"+ creators.get(i).youtube));
-//            i++;
-//        }
-//        if(!isLast){
-//            inv.addItem(new ItemStack(NEXT_PAGE));
-//        }
-//        else {
-//            inv.addItem(createHead(creators.get(i).playerName, "youtube.com/channel/"+ creators.get(i).youtube));
-//        }
 
         return inv;
     }
@@ -133,6 +123,57 @@ public class CreatorsGUI {
         skull.setOwningPlayer(player);
         item.setItemMeta(skull);
         return item;
+    }
+    
+    public static ItemStack createHead(CreatorsRow entry) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(entry.playerUUID);
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skull = (SkullMeta) item.getItemMeta();
+        skull.setDisplayName(ChatColor.RESET.toString() + ChatColor.YELLOW + player.getName());
+        List<String> lore = new ArrayList<String>(3);
+        lore.add(ChatColor.RESET.toString() + ChatColor.LIGHT_PURPLE + "youtube.com/channel/" + entry.youtube);
+        lore.add(ChatColor.RESET.toString() + formatSubcount(entry.subcount) + ChatColor.RESET + ChatColor.WHITE
+                         + " subscribers");
+        if (player.isOnline()) {
+            lore.add(ChatColor.RESET.toString() + ChatColor.GREEN + ChatColor.BOLD + "Online");
+        } else {
+            if (entry.lastLogout != null) {
+                lore.add(ChatColor.RESET.toString() + ChatColor.DARK_GRAY + ChatColor.ITALIC + "Last seen: "
+                                 + formatLastSeen(entry.lastLogout));
+            }
+        }
+        skull.setLore(lore);
+        skull.setOwningPlayer(player);
+        item.setItemMeta(skull);
+        return item;
+    }
+    
+    public static String formatSubcount(long subs) {
+        String asString = Long.toString(subs);
+        String output = asString;
+        int length = asString.length();
+        if (length > 6) {
+            output = ChatColor.DARK_PURPLE.toString() + ChatColor.BOLD + asString.substring(0, length - 6);
+            output = output + "." + asString.charAt(length - 6) + "M";
+        } else if (length > 5) {
+            output = ChatColor.BLUE + asString.substring(0, 3) + "K";
+        } else if (length > 4) {
+            output = ChatColor.GOLD + asString.substring(0, 2);
+            output = output + "." + asString.charAt(2) + "K";
+        } else if (length > 3) {
+            output = ChatColor.GRAY + asString.substring(0, 1);
+            output = output + "." + asString.substring(1, 3) + "K";
+        } else {
+            output = ChatColor.GRAY + asString;
+        }
+        
+        return output;
+    }
+    
+    public static String formatLastSeen(Timestamp lastSeen) {
+        return lastSeen.toInstant().atZone(TimeZone.getDefault().toZoneId()).format(
+                DateTimeFormatter.ofLocalizedDateTime(
+                        FormatStyle.MEDIUM));
     }
     
     public static ItemStack createHead(String name, String description) {

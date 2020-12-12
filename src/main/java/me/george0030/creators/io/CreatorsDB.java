@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.*;
+import java.time.Instant;
 import java.util.*;
 
 public class CreatorsDB {
@@ -37,9 +38,11 @@ public class CreatorsDB {
         table = plugin.getConfig().getString("table");
         connection.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + table
-                        + " (playerUUID BINARY(16), youtube TINYTEXT, subcount BIGINT(255))");
-        fetchQuery = connection.prepareStatement("SELECT playerUUID, youtube, subcount FROM " + table + " ORDER BY "
-                                                         + "subcount DESC LIMIT ? OFFSET ?");
+                        + " (playerUUID BINARY(16) NOT NULL UNIQUE, youtube TINYTEXT, subcount BIGINT(255), "
+                        + "lastlogoutUTC DATETIME, playername VARCHAR(32))");
+        plugin.getLogger().finer("Successfully connected to database " + plugin.getConfig().getString("url"));
+        fetchQuery = connection.prepareStatement("SELECT playerUUID, youtube, subcount, lastlogoutUTC FROM " + table
+                                                         + " ORDER BY subcount DESC LIMIT ? OFFSET ?");
     
     }
     
@@ -50,8 +53,9 @@ public class CreatorsDB {
         ResultSet result = fetchQuery.executeQuery();
         cache.clear();
         while (result.next()) {
-            cache.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3)));
-            
+            cache.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3),
+                                      result.getTimestamp(4), null));
+    
         }
         
         numberOfCreatorsInDatabase = fetchNumberOfCreatorsInDatabase();
@@ -78,21 +82,55 @@ public class CreatorsDB {
         LinkedList<CreatorsRow> table = new LinkedList<CreatorsRow>();
         int i = 0;
         while (result.next()) {
-            table.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3)));
+            table.add(new CreatorsRow(uuidFromBytes(result.getBytes(1)), result.getString(2), result.getLong(3),
+                                      result.getTimestamp(4), null));
         }
         
         return table;
         
     }
     
-    public void insert(UUID playerUUID, String youtube, long subs) throws SQLException {
+    public void insert(CreatorsRow row) throws SQLException {
         PreparedStatement insertQuery = connection.prepareStatement("REPLACE INTO " + table + " (playerUUID, youtube, "
-                                                                            + "subcount) VALUES (?,"
-                                                                            + "?,?)");
-        insertQuery.setBytes(1, bytesFromUUID(playerUUID));
-        insertQuery.setString(2, youtube);
-        insertQuery.setLong(3, subs);
+                                                                            + "subcount, playername) VALUES (?,"
+                                                                            + "?,?,?)");
+        insertQuery.setBytes(1, bytesFromUUID(row.playerUUID));
+        insertQuery.setString(2, row.youtube);
+        insertQuery.setLong(3, row.subcount);
+        insertQuery.setString(4, row.playerName);
         insertQuery.execute();
+    }
+    
+    public void updateLastLogonNow(UUID playerUUID) throws SQLException {
+        updateLastLogon(playerUUID, Timestamp.from(Instant.now()));
+    }
+    
+    public void updateLastLogon(UUID playerUUID, Timestamp timestamp) throws SQLException {
+        PreparedStatement updateQuery =
+                connection.prepareStatement("UPDATE " + table + " SET lastlogoutUTC = ? WHERE playerUUID = ?");
+        
+        updateQuery.setTimestamp(1, timestamp);
+        updateQuery.setBytes(2, bytesFromUUID(playerUUID));
+        updateQuery.execute();
+    }
+    
+    public int[] updateLastLogonsNow(Collection<UUID> playerUUIDs) throws SQLException {
+        return updateLastLogons(playerUUIDs, Timestamp.from(Instant.now()));
+    }
+    
+    public int[] updateLastLogons(Collection<UUID> playerUUIDs, Timestamp timestamp) throws SQLException {
+        if (!playerUUIDs.isEmpty()) {
+            PreparedStatement updateQuery =
+                    connection.prepareStatement("UPDATE " + table + " SET lastlogoutUTC = ? WHERE playerUUID = ?");
+            for (UUID uuid : playerUUIDs) {
+                updateQuery.setTimestamp(1, timestamp);
+                updateQuery.setBytes(2, bytesFromUUID(uuid));
+                updateQuery.addBatch();
+            }
+            
+            return updateQuery.executeBatch();
+        }
+        return new int[]{0};
     }
     
     private byte[] bytesFromUUID(UUID uuid) {

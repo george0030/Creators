@@ -7,15 +7,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class CreatorsListener implements Listener {
+import java.sql.SQLException;
 
+public class CreatorsListener implements Listener {
+    
     private final Creators plugin;
     private final CreatorsGUI gui;
-
+    
     public CreatorsListener(Creators plugin) {
         this.plugin = plugin;
         gui = plugin.gui;
@@ -79,18 +82,45 @@ public class CreatorsListener implements Listener {
     }
     
     @EventHandler
-    public void onPlayerJoinEvent(PlayerJoinEvent e) {
-    
-    
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        
+        
         if (e.getPlayer().hasPermission("creators.youtuber")) {
-    
+            
             if (!plugin.database.containsEntry(e.getPlayer().getUniqueId())) {
                 plugin.gui.openAnvilGUI(e.getPlayer(), "§4Enter YouTube ID:", "Loading...§7", CreatorsGUI.ITEM_TO_NAME,
                                         false);
             }
         }
+        
+        
+    }
     
     
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        
+        Player p = e.getPlayer();
+        if (p.hasPermission("creators.youtuber")) {
+            if (plugin.database.containsEntry(p.getUniqueId())) {
+                new BukkitRunnable() {
+                    
+                    @Override
+                    public void run() {
+                        try {
+                            plugin.database.updateLastLogonNow(p.getUniqueId());
+                            plugin.getLogger().finest("Successfully updated last seen data of " + p.getName() + "/"
+                                                              + p.getUniqueId().toString() + " to the database.");
+                        } catch (SQLException throwables) {
+                            plugin.getLogger().warning("Unable to update last seen data of " + p.getName() + "/"
+                                                               + p.getUniqueId().toString() + " to the database");
+                            throwables.printStackTrace();
+                        }
+                    }
+                }.runTaskAsynchronously(plugin);
+            }
+        }
+        
     }
 }
 

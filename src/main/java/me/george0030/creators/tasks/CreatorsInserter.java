@@ -3,6 +3,7 @@ package me.george0030.creators.tasks;
 import me.george0030.creators.Creators;
 import me.george0030.creators.io.CreatorsDB;
 import me.george0030.creators.listener.CreatorsGUI;
+import me.george0030.creators.misc.CreatorsRow;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -73,7 +74,8 @@ public class CreatorsInserter extends BukkitRunnable {
         }
 
         try {
-            db.insert(playerID, youtube.substring(youtube.lastIndexOf("/") + 1), subCount);
+            db.insert(new CreatorsRow(playerID, youtube.substring(youtube.lastIndexOf("/") + 1), subCount, null,
+                                      playerName));
         } catch (SQLException throwables) {
             plugin.getLogger().warning("Failed to insert " + playerName + " into database.");
             throwables.printStackTrace();
@@ -92,7 +94,7 @@ public class CreatorsInserter extends BukkitRunnable {
             @Override
             public void run() {
                 plugin.getServer().getPlayer(playerID).sendMessage(
-                        "§a Successfully registered YouTube channel §dyoutube.com/" + youtube.substring(
+                        "§a Successfully registered YouTube channel §dyoutube.com/channel/" + youtube.substring(
                                 youtube.lastIndexOf("/") + 1));
             }
         }.runTask(plugin);
