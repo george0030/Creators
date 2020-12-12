@@ -3,6 +3,8 @@
 
 ## Usage:
 
+For version 1.16
+
 Every time a player with the permission tag 'creators.youtuber' joins, they will be asked to give their YouTube channel ID.
 If the channel is valid, the address will be recorded alongside the player's UUID to the database specified in the config.
 If they refuse to give their ID, it can be added later by /creators register.
