@@ -25,3 +25,7 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 ## Potentially upcoming features (feel free to give suggestions :)
 
 - Announcements every time a registered creator joins the server
+
+## Downloads
+
+- Check Releases tab
