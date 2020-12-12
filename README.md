@@ -14,7 +14,9 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 ## Commands | permissions:
 
 /creators | creators.view - Open a chest GUI containing heads of all creators registered on database.
+
 /creators link <playername> | creators.view - Get the link to given creator's YouTube channel
+ 
 /creators register | creators.youtuber - Register yourself as a creator by giving your YouTube channel ID.
 
 
