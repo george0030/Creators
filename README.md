@@ -18,6 +18,6 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 /creators register | creators.youtuber - Register yourself as a creator by giving your YouTube channel ID.
 
 
-### Potentially upcoming features (feel free to give suggestions :)
+## Potentially upcoming features (feel free to give suggestions :)
 
 - Announcements every time a registered creator joins the server
