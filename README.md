@@ -28,4 +28,4 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 
 ## Downloads
 
-- Check Releases
+- Check Releases.
