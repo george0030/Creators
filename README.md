@@ -32,4 +32,4 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 
 ## Pictures
 
-![alt text](https://github.com/george0030/Creators/blob/master/yt_registration.png?raw=true)
+![alt text](https://github.com/george0030/Creators/blob/master/yt_registration.png?raw=true) ![alt text](https://github.com/george0030/Creators/blob/master/creators_menu.png?raw=true)
