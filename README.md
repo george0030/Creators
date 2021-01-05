@@ -29,3 +29,7 @@ This plugin relies on the server having its own API-key for YouTube queries in o
 ## Downloads
 
 - Check Releases.
+
+## Pictures
+
+![alt text](https://github.com/george0030/Creators/blob/master/yt_registration.png?raw=true)
